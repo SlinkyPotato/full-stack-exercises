@@ -1,12 +1,12 @@
 const PersonForm = 
-({newName, newNameChange, addPerson, newNumberChange, newNumber}) => {
+({newName, onNameChange, onSubmitPerson, onNumberChange, newNumber}) => {
   return (
-    <form onSubmit={addPerson}>
+    <form onSubmit={onSubmitPerson}>
       <div>
-        name: <input onChange={newNameChange} value={newName}/> <br />
+        name: <input onChange={onNameChange} value={newName}/> <br />
       </div>
       <div>
-        number: <input onChange={newNumberChange} value={newNumber} />
+        number: <input onChange={onNumberChange} value={newNumber} />
       </div>
       <div>
         <button type="submit">add</button>
