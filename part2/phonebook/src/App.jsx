@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
-import PersonForm from './components/PersonForm'
-import Persons from './components/Persons'
-import Filter from './components/Filter'
-import phoneService from './services/phoneService'
-
+import { useEffect, useState } from 'react';
+import PersonForm from './components/PersonForm';
+import Persons from './components/Persons';
+import Filter from './components/Filter';
+import phoneService from './services/phoneService';
+import Notification from './components/Notification';
 
 function App() {
   const [persons, setPersons] = useState([]);
@@ -11,6 +11,8 @@ function App() {
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [filter, setFilter] = useState('');
+  const [successMessage, setSuccessMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
     console.log('effect');
@@ -38,6 +40,10 @@ function App() {
         setPersons(persons.filter(person => person.id !== id));
       }).catch(error => {
         console.error('failed to delete person', error);
+        setErrorMessage(`Information of ${persons.find(person => person.id === id).name} has already been removed from server`);
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 5000);
       });
     }
   
@@ -49,8 +55,8 @@ function App() {
 
   const onSubmitPerson = (event) => {
     event.preventDefault();
-    let isNewPerson = false;
     let personFound = null;
+    let newId = 0;
     for (let person of persons) {
       if (person.name.toLowerCase() === newName.toLowerCase() && person.number === newNumber) {
         alert(`${newName} is already added to phonebook`);
@@ -60,9 +66,12 @@ function App() {
         alert(`number ${newNumber} is already added to phonebook`);
         return;
       }
+      if(person.id >= newId) {
+        newId = person.id;
+      }
+
       if (person.name.toLowerCase() === newName.toLowerCase() && person.number !== newNumber) {
         personFound = person;
-        break;
       }
     }
 
@@ -83,16 +92,23 @@ function App() {
         setPersons(persons.map(person => person.id !== personFound.id ? person : data));
         setNewName('');
         setNewNumber('');
+        setSuccessMessage(`Updated ${personFound.name}`);
+        setTimeout(() => {
+          setSuccessMessage(null);
+        }, 5000);
+
       }).catch(error => {
         console.error('failed to update person', error);
+        setErrorMessage(`Information of ${personFound.name} has already been removed from server`);
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 5000);
       });
-    }
-
-    if(isNewPerson) {
+    } else {
       console.log('attempting to add person');
       const personObject = {
         name: newName,
-        id: persons.length + 1,
+        id: newId + 1,
         number: newNumber,
       };
 
@@ -101,14 +117,23 @@ function App() {
         setPersons(persons.concat(data));
         setNewName('');
         setNewNumber('');
+        setSuccessMessage(`Added ${personObject.name}`);
+        setTimeout(() => {
+          setSuccessMessage(null);
+        }, 5000);
       }).catch(error => {
         console.error('failed to save person', error);
+        setErrorMessage(`Information of ${personObject.name} has already been removed from server`);
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 5000);
       });
     }
   };
   
   return (
     <div>
+      <Notification success={successMessage} error={errorMessage}/>
       <h2>Phonebook</h2>
       <Filter
         filter={filter}
