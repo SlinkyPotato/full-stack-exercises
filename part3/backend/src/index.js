@@ -1,8 +1,9 @@
 const express = require('express');
 const morgan = require('morgan');
+const cors = require('cors');
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 let persons = [
   { 
@@ -27,12 +28,18 @@ let persons = [
   }
 ];
 
+app.use(cors());
+
+app.use(express.static('ui-dist'));
+
 app.use(express.json());
+
 app.use(morgan('tiny', {
   skip: (req, _) => {
     return req.method === 'POST';
   }
 }));
+
 app.use(morgan((tokens, req, res) => {
   if (req.method !== 'POST') {
     return;
