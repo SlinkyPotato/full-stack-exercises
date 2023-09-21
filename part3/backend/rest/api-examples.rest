@@ -1,7 +1,16 @@
-DELETE http://localhost:3001/api/persons/1
+### 
+GET http://localhost:3001/api/persons
 
 ###
+GET http://localhost:3001/api/persons/650c309e44dc36d0d71796cd
 
+###
+GET http://localhost:3001/info
+
+###
+DELETE http://localhost:3001/api/persons/650b1ffc0c168777add4511b
+
+###
 POST http://localhost:3001/api/persons
 Content-Type: application/json
 
@@ -9,3 +18,4 @@ Content-Type: application/json
   "name": "Brian Patino",
   "number": "123-456-7777"
 }
+

@@ -4,31 +4,11 @@ const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
 
+const mongoose = require('mongoose');
+const PersonModel = require('./models/persons.model');
+
 const app = express();
 const PORT = process.env.PORT || 3001;
-
-let persons = [
-  { 
-    "id": 1,
-    "name": "Arto Hellas", 
-    "number": "040-123456"
-  },
-  { 
-    "id": 2,
-    "name": "Ada Lovelace", 
-    "number": "39-44-5323523"
-  },
-  { 
-    "id": 3,
-    "name": "Dan Abramov", 
-    "number": "12-43-234345"
-  },
-  { 
-    "id": 4,
-    "name": "Mary Poppendieck", 
-    "number": "39-23-6423122"
-  }
-];
 
 app.use(cors());
 
@@ -61,7 +41,12 @@ app.listen(PORT, () => {
 });
 
 app.get('/api/persons', (req, res) => {
-  res.json(persons);
+  PersonModel.find({}).then(result => {
+    res.json(result);
+  }).catch(err => {
+    console.log('Error finding persons:', err.message);
+    res.status(404).end();
+  });
 });
 
 app.post('/api/persons', (req, res) => {
@@ -76,45 +61,72 @@ app.post('/api/persons', (req, res) => {
       error: 'phone number missing'
     });
   }
-  if (persons.find(p => p.name === body.name)) {
-    return res.status(400).json({
-      error: 'name must be unique'
+
+  PersonModel.find({}).then(persons => {
+    console.log(`Found persons ${persons.length}`);
+
+    if (persons.find(p => p.name === body.name)) {
+      return res.status(400).json({
+        error: 'name must be unique'
+      });
+    }
+  
+    const maxId = persons.length > 0 ? Math.floor((Math.random() * 10000000)) : 1;
+    const person = {
+      _id: new mongoose.Types.ObjectId(maxId + 1),
+      name: body.name,
+      number: body.number
+    };
+  
+    PersonModel.create(person).then(_ => {
+      console.log('Person saved!');
+      res.json(person);
+    }).catch(err => {
+      console.log('Error saving person:', err.message);
+      res.status(500).end();
     });
-  }
-  const maxId = persons.length > 0 ? Math.floor((Math.random() * 10000000)) : 1;
-  const person = {
-    id: maxId + 1,
-    name: body.name,
-    number: body.number
-  };
-  persons = persons.concat(person);
-  res.json(person);
+  }).catch(err => {
+    console.log('Error finding persons:', err.message);
+    res.status(500).end();
+  });
 });
 
 app.get('/info', (req, res) => {
   const newDate = new Date();
-  const info = `<p>Phonebook has info for ${persons.length} people</p><p>${newDate}</p>`;
-  res.send(info);
+  PersonModel.find({}).then(result => {
+    const info = `<p>Phonebook has info for ${result.length} people</p><p>${newDate}</p>`;
+    res.send(info);
+  }).catch(err => {
+    console.log('Error finding persons:', err.message);
+    res.status(404).end();
+  });
 });
 
 app.get('/api/persons/:id', (req, res) => {
-  const id = Number(req.params.id);
-  const person = persons.find(p => p.id === id);
-
-  if(person) {
-    res.json(person);
-  } else {
+  const id = new mongoose.Types.ObjectId(req.params.id);
+  PersonModel.findById(id).then(result => {
+    console.log(`Found person id: ${id}`);
+    res.json(result);
+  }).catch(err => {
+    console.log('Error finding person:', err.message);
     res.status(404).end();
-  }
+  });
 });
 
 app.delete('/api/persons/:id', (req, res) => {
-  const id = Number(req.params.id);
-  const newPersons = persons.filter(p => p.id !== id);
-  if (newPersons.length === persons.length) {
-    res.status(404).end();
-  } else {
-    persons = newPersons;
-    res.status(204).end();
-  }
+  const id = new mongoose.Types.ObjectId(req.params.id);
+  console.log(id);
+  PersonModel.deleteOne({ _id: id }).then(result => {
+    console.log(result);
+    if (result.deletedCount === 1) {
+      console.log(`Deleted person id: ${id}`);
+      res.status(204).end();
+    } else {
+      console.log(`Person not found id: ${id}`);
+      res.status(404).end();
+    }
+  }).catch(err => {
+    console.log('Error deleting person:', err.message);
+    res.status(500).end();
+  });
 });
