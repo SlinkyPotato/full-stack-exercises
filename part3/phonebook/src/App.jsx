@@ -15,9 +15,8 @@ function App() {
   const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
-    console.log('effect');
     phoneService.getPersons().then(data => {
-      console.log('promise fulfilled');
+      console.log('persons fetched', data);
       setPersons(data);
     }).catch(error => {
       console.error('failed to fetch persons', error);
@@ -33,10 +32,8 @@ function App() {
   };
 
   const onDelete = (id) => {
-    console.log('delete button clicked');
     if (window.confirm(`Delete ${persons.find(person => person.id === id).name}?`)) {
       phoneService.deletePerson(id).then(() => {
-        console.log('promise fulfilled');
         setPersons(persons.filter(person => person.id !== id));
       }).catch(error => {
         console.error('failed to delete person', error);
@@ -76,19 +73,17 @@ function App() {
     }
 
     if(personFound) {
+      console.log('person found', personFound);
       const confirm = window.confirm(`${personFound.name} is already added to phonebook, replace the old number with a new one?`);
       if (!confirm) {
         return;
       }
       console.log('attempting to update phone');
       const personObject = {
-        name: personFound.name,
-        id: personFound.id,
         number: newNumber,
       };
 
       phoneService.updatePerson(personFound.id, personObject).then(data => {
-        console.log('promise fulfilled');
         setPersons(persons.map(person => person.id !== personFound.id ? person : data));
         setNewName('');
         setNewNumber('');
@@ -99,21 +94,18 @@ function App() {
 
       }).catch(error => {
         console.error('failed to update person', error);
-        setErrorMessage(`Information of ${personFound.name} has already been removed from server`);
+        setErrorMessage(error.response.data.error);
         setTimeout(() => {
           setErrorMessage(null);
         }, 5000);
       });
     } else {
-      console.log('attempting to add person');
       const personObject = {
         name: newName,
-        id: newId + 1,
         number: newNumber,
       };
-
+      console.log('attempting to add person', personObject);
       phoneService.savePerson(personObject).then(data => {
-        console.log('promise fulfilled');
         setPersons(persons.concat(data));
         setNewName('');
         setNewNumber('');
@@ -122,8 +114,8 @@ function App() {
           setSuccessMessage(null);
         }, 5000);
       }).catch(error => {
-        console.error('failed to save person', error);
-        setErrorMessage(`Information of ${personObject.name} has already been removed from server`);
+        console.error('failed to add person', error);
+        setErrorMessage(error.response.data.error);
         setTimeout(() => {
           setErrorMessage(null);
         }, 5000);

@@ -40,7 +40,7 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-app.get('/api/persons', (req, res, next) => {
+app.get('/api/persons', (_, res) => {
   PersonModel.find({}).then(result => {
     res.json(result);
   }).catch(err => {
@@ -49,28 +49,10 @@ app.get('/api/persons', (req, res, next) => {
   });
 });
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
   const body = req.body;
-  if (!body.name) {
-    return res.status(400).json({
-      error: 'name missing'
-    });
-  }
-  if (!body.number) {
-    return res.status(400).json({
-      error: 'phone number missing'
-    });
-  }
-
   PersonModel.find({}).then(persons => {
     console.log(`Found persons ${persons.length}`);
-
-    if (persons.find(p => p.name === body.name)) {
-      return res.status(400).json({
-        error: 'name must be unique'
-      });
-    }
-  
     const maxId = persons.length > 0 ? Math.floor((Math.random() * 10000000)) : 1;
     const person = {
       _id: new mongoose.Types.ObjectId(maxId + 1),
@@ -78,12 +60,11 @@ app.post('/api/persons', (req, res) => {
       number: body.number
     };
   
-    PersonModel.create(person).then(_ => {
+    PersonModel.create(person).then(result => {
       console.log('Person saved!');
-      res.json(person);
+      res.json(result);
     }).catch(err => {
-      console.log('Error saving person:', err.message);
-      res.status(500).end();
+      return next(err);
     });
   }).catch(err => {
     console.log('Error finding persons:', err.message);
@@ -103,62 +84,39 @@ app.get('/info', (req, res) => {
 });
 
 app.get('/api/persons/:id', (req, res, next) => {
-  let id;
-  try {
-    id = new mongoose.Types.ObjectId(req.params.id);
-  } catch (err) {
-    return next(err);
-  }
-  
-  PersonModel.findById(id).then(result => {
+    PersonModel.findById(req.params.id).then(result => {
     if (!result) {
       next(new Error('Person not found'));
     }
-    console.log(`Found person id: ${id}`);
+    console.log(`Found person id: ${req.params.id}`);
     res.json(result);
   }).catch(err => {
-    console.log('Error finding person:', err.message);
-    res.status(404).end();
+    return next(err);
   });
 });
 
 app.delete('/api/persons/:id', (req, res, next) => {
-  let id;
-  try {
-    id = new mongoose.Types.ObjectId(req.params.id);
-  } catch (err) {
-    return next(err);
-  }
+  const id = req.params.id;
   PersonModel.deleteOne({ _id: id }).then(result => {
     console.log(result);
     if (result.deletedCount === 1) {
       console.log(`Deleted person id: ${id}`);
       res.status(204).end();
     } else {
-      console.log(`Person not found id: ${id}`);
-      res.status(404).end();
+      return next(new Error('Person not found'));
     }
   }).catch(err => {
-    console.log('Error deleting person:', err.message);
-    res.status(500).end();
+    return next(err);
   });
 });
 
 app.put('/api/persons/:id', (req, res, next) => {
   const body = req.body;
 
-  if (!body.name) {
-    return res.status(400).json({
-      error: 'name missing'
-    });
-  }
-  if (!body.number) {
-    return res.status(400).json({
-      error: 'phone number missing'
-    });
-  }
-
-  PersonModel.findByIdAndUpdate(req.params.id, { number: body.number }, { new: true })
+  PersonModel.findByIdAndUpdate(req.params.id,
+    { number: body.number },
+    { new: true, runValidators: true, context: 'query' },
+  )
   .then(result => {
     if (!result) {
       return next(new Error('Person not found'));
@@ -183,8 +141,12 @@ const errorHandler = (err, req, res, next) => {
     return res.status(400).send({ error: 'malformatted id' });
   } else if (err.message === 'Person not found') {
     return res.status(404).send();
+  } else if (err.name === 'ValidationError') {
+    return res.status(400).json({ error: err.message });
+  } else if (err.code === 11000) {
+    return res.status(400).json({ error: 'Name should be unique' });
   }
-
+  console.log(err);
   next(err);
 };
 

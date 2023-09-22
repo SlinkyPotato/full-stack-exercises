@@ -2,8 +2,6 @@ const Notification = ({ success, error }) => {
   if (success === null && error === null) {
     return null;
   }
-  console.log(success);
-  console.log(error);
 
   if (success !== null) {
     const style = {
