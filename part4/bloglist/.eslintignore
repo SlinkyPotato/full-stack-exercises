@@ -1,0 +1,11 @@
+ui-dist
+node_modules
+rest
+.dockerignore
+.env
+.gitignore
+Dockerfile
+fly.toml
+package.json
+pnpm-lock.yaml
+README.md

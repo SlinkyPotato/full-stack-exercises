@@ -1,0 +1,13 @@
+###
+GET http://localhost:3001/api/blogs
+
+###
+POST http://localhost:3001/api/blogs
+Content-Type: application/json
+
+{
+  "title": "A Blog",
+  "author": "Brian Patino",
+  "url": "http://localhost:8080",
+  "likes": 3
+}
