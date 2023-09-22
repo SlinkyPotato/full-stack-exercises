@@ -27,7 +27,7 @@ if (name && number) {
     number,
   });
 
-  person.save().then((_) => {
+  person.save().then(() => {
     console.log(`added ${name} number ${number} to phonebook`);
     mongoose.connection.close();
   });

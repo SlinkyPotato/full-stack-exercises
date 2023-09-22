@@ -17,7 +17,7 @@ app.use(express.static('ui-dist'));
 app.use(express.json());
 
 app.use(morgan('tiny', {
-  skip: (req, _) => {
+  skip: (req) => {
     return req.method === 'POST';
   }
 }));
@@ -59,7 +59,7 @@ app.post('/api/persons', (req, res, next) => {
       name: body.name,
       number: body.number
     };
-  
+
     PersonModel.create(person).then(result => {
       console.log('Person saved!');
       res.json(result);
@@ -84,7 +84,7 @@ app.get('/info', (req, res) => {
 });
 
 app.get('/api/persons/:id', (req, res, next) => {
-    PersonModel.findById(req.params.id).then(result => {
+  PersonModel.findById(req.params.id).then(result => {
     if (!result) {
       next(new Error('Person not found'));
     }
@@ -117,15 +117,15 @@ app.put('/api/persons/:id', (req, res, next) => {
     { number: body.number },
     { new: true, runValidators: true, context: 'query' },
   )
-  .then(result => {
-    if (!result) {
-      return next(new Error('Person not found'));
-    }
-    console.log(`Updated person id: ${req.params.id}`);
-    res.json(result);
-  }).catch(err => {
-    next(err);
-  });
+    .then(result => {
+      if (!result) {
+        return next(new Error('Person not found'));
+      }
+      console.log(`Updated person id: ${req.params.id}`);
+      res.json(result);
+    }).catch(err => {
+      next(err);
+    });
 });
 
 const unknownEndpoint = (req, res) => {
