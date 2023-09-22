@@ -40,7 +40,7 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-app.get('/api/persons', (req, res) => {
+app.get('/api/persons', (req, res, next) => {
   PersonModel.find({}).then(result => {
     res.json(result);
   }).catch(err => {
@@ -102,9 +102,18 @@ app.get('/info', (req, res) => {
   });
 });
 
-app.get('/api/persons/:id', (req, res) => {
-  const id = new mongoose.Types.ObjectId(req.params.id);
+app.get('/api/persons/:id', (req, res, next) => {
+  let id;
+  try {
+    id = new mongoose.Types.ObjectId(req.params.id);
+  } catch (err) {
+    return next(err);
+  }
+  
   PersonModel.findById(id).then(result => {
+    if (!result) {
+      next(new Error('Person not found'));
+    }
     console.log(`Found person id: ${id}`);
     res.json(result);
   }).catch(err => {
@@ -113,9 +122,13 @@ app.get('/api/persons/:id', (req, res) => {
   });
 });
 
-app.delete('/api/persons/:id', (req, res) => {
-  const id = new mongoose.Types.ObjectId(req.params.id);
-  console.log(id);
+app.delete('/api/persons/:id', (req, res, next) => {
+  let id;
+  try {
+    id = new mongoose.Types.ObjectId(req.params.id);
+  } catch (err) {
+    return next(err);
+  }
   PersonModel.deleteOne({ _id: id }).then(result => {
     console.log(result);
     if (result.deletedCount === 1) {
@@ -130,3 +143,49 @@ app.delete('/api/persons/:id', (req, res) => {
     res.status(500).end();
   });
 });
+
+app.put('/api/persons/:id', (req, res, next) => {
+  const body = req.body;
+
+  if (!body.name) {
+    return res.status(400).json({
+      error: 'name missing'
+    });
+  }
+  if (!body.number) {
+    return res.status(400).json({
+      error: 'phone number missing'
+    });
+  }
+
+  PersonModel.findByIdAndUpdate(req.params.id, { number: body.number }, { new: true })
+  .then(result => {
+    if (!result) {
+      return next(new Error('Person not found'));
+    }
+    console.log(`Updated person id: ${req.params.id}`);
+    res.json(result);
+  }).catch(err => {
+    next(err);
+  });
+});
+
+const unknownEndpoint = (req, res) => {
+  res.status(404).send({ error: 'unknown endpoint' });
+};
+
+app.use(unknownEndpoint);
+
+const errorHandler = (err, req, res, next) => {
+  console.log('Error:', err.message);
+
+  if (err.name === 'CastError' | err.name === 'BSONError') {
+    return res.status(400).send({ error: 'malformatted id' });
+  } else if (err.message === 'Person not found') {
+    return res.status(404).send();
+  }
+
+  next(err);
+};
+
+app.use(errorHandler);
