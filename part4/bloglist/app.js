@@ -6,16 +6,29 @@ const cors = require('cors');
 const blogRouter = require('./controllers/blog.controller');
 const middleware = require('./utils/logger.middleware');
 const mongoose = require('mongoose');
+const { MongoMemoryServer } = require('mongodb-memory-server');
 
 mongoose.set('strictQuery', true);
 
-log.info('connecting to db');
-mongoose.connect(config.MONGODB_SRV)
-  .then(() => {
-    log.info('connected to MongoDB');
-  }).catch((error) => {
-    log.error('error connecting to MongoDB:', error.message);
-  });
+if (process.env.NODE_ENV === 'test') {
+  MongoMemoryServer.create()
+    .then((mongoServer) => {
+      mongoose.connect(mongoServer.getUri(), {
+        dbName: 'test',
+      }).then(() => {
+        log.info('connected to in-memory MongoDB');
+      }).catch((error) => {
+        log.error('error connecting to in-memory MongoDB:', error.message);
+      });
+    });
+} else {
+  mongoose.connect(config.MONGODB_SRV)
+    .then(() => {
+      log.info('connected to MongoDB');
+    }).catch((error) => {
+      log.error('error connecting to MongoDB:', error.message);
+    });
+}
 
 app.use(cors());
 app.use(express.static('build'));
