@@ -11,3 +11,14 @@ Content-Type: application/json
   "url": "http://localhost:8080",
   "likes": 3
 }
+
+###
+DELETE http://localhost:3001/api/blogs/65107b39dab24d6146b31348
+
+###
+PATCH http://localhost:3001/api/blogs/5a7d1b4b1c9d440000b7e8b1
+Content-Type: application/json
+
+{
+  "likes": null
+}
