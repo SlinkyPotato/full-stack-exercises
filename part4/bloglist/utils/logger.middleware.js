@@ -23,6 +23,8 @@ const errorHandler = (error, request, response, next) => {
     return response.status(404).json({ error: error.message });
   } else if (error.message === 'likes is required') {
     return response.status(400).json({ error: error.message });
+  } else if (error.code === 11000) {
+    return response.status(400).json({ error: error.message });
   }
 
   next(error);
