@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 
 userRouter.get('/', async (req, res, next) => {
   try {
-    const result = await userModel.find({});
+    const result = await userModel.find({}).populate('blogs', 'title author url likes');
     res.json(result);
   } catch(error) {
     next(error);
@@ -26,8 +26,10 @@ userRouter.post('/', async (req, res, next) => {
       username: req.body.username,
       name: req.body.name,
       passwordHash,
+      blogs: [],
     });
     const result = await user.save();
+    await result.populate('blogs', 'title author url likes');
     res.status(201).json(result);
   } catch (error) {
     next(error);

@@ -3,9 +3,12 @@ const log = require('./utils/log.logger');
 const express = require('express');
 const app = express();
 const cors = require('cors');
+
 const blogRouter = require('./controllers/blog.controller');
 const userRouter = require('./controllers/user.controller');
-const middleware = require('./utils/logger.middleware');
+const loginRouter = require('./controllers/login.controller');
+
+const middleware = require('./utils/middleware');
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 
@@ -35,9 +38,11 @@ app.use(cors());
 app.use(express.static('build'));
 app.use(express.json());
 app.use(middleware.requestLogger);
+app.use(middleware.tokenExtractor);
 
 app.use('/api/blogs', blogRouter);
 app.use('/api/users', userRouter);
+app.use('/api/login', loginRouter);
 
 app.use(middleware.unknownEndpoint);
 app.use(middleware.errorHandler);
