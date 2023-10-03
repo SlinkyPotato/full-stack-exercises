@@ -52,12 +52,16 @@ const userExtractor = async (request, response, next) => {
   if (!request.token) {
     return response.status(401).json({ error: 'token missing' });
   }
-  const token = jwt.verify(request.token, process.env.SECRET);
-  const user = await userModel.findOne({ _id: token.id });
-  if (!user) {
-    return next(new Error({ name: 'TokenExpiredError' }));
+  try {
+    const token = jwt.verify(request.token, process.env.SECRET);
+    const user = await userModel.findOne({ _id: token.id });
+    if (!user) {
+      return next(new Error({ name: 'TokenExpiredError' }));
+    }
+    request.user = user;
+  } catch (error) {
+    return next(error);
   }
-  request.user = user;
   next();
 };
 

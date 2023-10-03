@@ -13,8 +13,9 @@ blogRouter.get('/', async (req, res, next) => {
 });
 
 blogRouter.post('/', userExtractor, async (req, res, next) => {
+  const user = req.user;
+
   try {
-    const user = req.user;
     const blog = new blogModel({
       title: req.body.title,
       author: req.body.author,
@@ -33,8 +34,8 @@ blogRouter.post('/', userExtractor, async (req, res, next) => {
 });
 
 blogRouter.delete('/:id', userExtractor, async (req, res, next) => {
+  const user = req.user;
   try {
-    const user = req.user;
     const blogToDelete = await blogModel.findOne({ _id: req.params.id });
     if (!blogToDelete) {
       throw new Error('blog not found');
@@ -53,6 +54,7 @@ blogRouter.delete('/:id', userExtractor, async (req, res, next) => {
 });
 
 blogRouter.patch('/:id', userExtractor, async (req, res, next) => {
+  const user = req.user;
   const numOfLikes = req.body.likes;
 
   if (numOfLikes === undefined || numOfLikes === null) {
@@ -60,6 +62,14 @@ blogRouter.patch('/:id', userExtractor, async (req, res, next) => {
   }
 
   try {
+    const blogToPatch = await blogModel.findOne({ _id: req.params.id });
+    if (!blogToPatch) {
+      throw new Error('blog not found');
+    }
+    if (blogToPatch.user.toString() !== user._id.toString()) {
+      throw new Error('unauthorized');
+    }
+
     const result = await blogModel.findByIdAndUpdate(req.params.id, { likes: numOfLikes }, { new: true });
     if (result === null) {
       return next(new Error('blog not found'));

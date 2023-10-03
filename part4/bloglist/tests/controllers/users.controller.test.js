@@ -1,14 +1,18 @@
 const supertest = require('supertest');
 const mongoose = require('mongoose');
-const app = require('../app');
+const app = require('../../app');
 const api = supertest(app);
-const userModel = require('../models/user.model');
+const userModel = require('../../models/user.model');
 const bcrypt = require('bcrypt');
 
 describe('users.controller.js', () => {
 
   beforeEach(async () => {
     await mongoose.connection.collection('users').deleteMany({});
+  });
+
+  afterAll(async () => {
+    await mongoose.connection.close();
   });
 
   describe('GET /api/users', () => {
