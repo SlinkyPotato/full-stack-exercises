@@ -1,7 +1,16 @@
-const loginService = require('../services/login');
-const blogService = require('../services/blogs');
+import loginService from '../services/login';
+import blogService from '../services/blogs';
 
-const handleLogin = async (event) => {
+const handleLogin = async (
+  event, 
+  username, 
+  password,
+  setUser,
+  setUsername,
+  setPassword,
+  setErrorMessage,
+  setSuccessMessage,
+) => {
   event.preventDefault();
   try {
     const user = await loginService.login({
@@ -14,14 +23,32 @@ const handleLogin = async (event) => {
     setUser(user);
     setUsername('');
     setPassword('');
+    setSuccessMessage('login successful');
+    setTimeout(() => {
+      setSuccessMessage(null);
+    }, 5000);
   } catch (exception) {
     console.log(exception);
+    setErrorMessage(exception.response.data.error);
+    setTimeout(() => {
+      setErrorMessage(null);
+    }, 5000);
   }
 };
 
-const LoginForm = ({ handleLogin, username, password, setUsername, setPassword }) => {
+const LoginForm = ({
+  username,
+  password,
+  setUsername,
+  setPassword,
+  setUser,
+  setErrorMessage,
+  setSuccessMessage,
+}) => {
   return (
-    <form onSubmit={handleLogin}>
+    <form onSubmit={(event) => {
+      handleLogin(event, username, password, setUser, setUsername, setPassword, setErrorMessage, setSuccessMessage);
+    }}>
       <div>
         username
         <input

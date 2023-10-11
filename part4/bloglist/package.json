@@ -4,11 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "NODE_ENV=production node index.js",
-    "dev": "NODE_ENV=development nodemon index.js",
+    "start": "cross-env NODE_ENV=production node index.js",
+    "dev": "cross-env NODE_ENV=development nodemon index.js",
     "debug": "node --inspect index.js",
     "build:ui": "rm -rf ui-dist && cd ../phonebook && pnpm build -- --prod && cp -r dist ../backend/ui-dist",
-    "test": "NODE_ENV=test jest --verbose --runInBand",
+    "test": "cross-env NODE_ENV=test jest --verbose --runInBand",
     "deploy:fly": "fly deploy",
     "lint": "eslint ."
   },
@@ -25,7 +25,8 @@
     "mongoose": "^7.5.2",
     "mongoose-unique-validator": "^4.0.0",
     "morgan": "^1.10.0",
-    "supertest": "^6.3.3"
+    "supertest": "^6.3.3",
+    "cross-env": "^7.0.3"
   },
   "devDependencies": {
     "eslint": "^8.49.0",

@@ -12,12 +12,16 @@ const getAll = async () => {
 };
 
 const setToken = (newToken) => {
-  axios.defaults.headers.common['Authorization'] = `bearer ${newToken}`
+  axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`
 };
 
 const create = async (newObject) => {
   try {
-    const response = await axios.post(baseUrl, newObject)
+    const response = await axios.post(baseUrl, newObject, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
     return response.data
   } catch (error) {
     console.log(error);
