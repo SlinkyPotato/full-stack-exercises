@@ -4,6 +4,7 @@ import blogService from './services/blogs'
 import LoginForm from './components/LoginForm'
 import CreateBlogForm from './components/CreateBlogForm'
 import Notification from './components/Notification'
+import Toggable from './components/Toggable'
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
@@ -22,7 +23,7 @@ const App = () => {
     );
 
     const loggedUserJSON = window.localStorage.getItem('loggedUser');
-    if (loggedUserJSON) {
+    if (loggedUserJSON && loggedUserJSON != '' && loggedUserJSON != 'null') {
       const user = JSON.parse(loggedUserJSON);
       setUser(user);
       blogService.setToken(user.token);
@@ -82,17 +83,18 @@ const App = () => {
             window.localStorage.removeItem('loggedUser');
             setUser(null);
           }}>logout</button>
-
-          <h2>create new</h2>
-          <CreateBlogForm
-            handleBlogForm={handleBlogForm}
-            setTitle={setTitle}
-            setAuthor={setAuthor}
-            setUrl={setUrl}
-            title={title}
-            author={author}
-            url={url}
-          />
+          <Toggable buttonLabel='new blog'>
+            <h2>create new</h2>
+            <CreateBlogForm
+              handleBlogForm={handleBlogForm}
+              setTitle={setTitle}
+              setAuthor={setAuthor}
+              setUrl={setUrl}
+              title={title}
+              author={author}
+              url={url}
+            />
+          </Toggable>
           <div>
             <br />
             {blogs.map(blog =>
