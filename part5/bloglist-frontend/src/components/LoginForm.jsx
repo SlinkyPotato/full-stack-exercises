@@ -2,8 +2,8 @@ import loginService from '../services/login';
 import blogService from '../services/blogs';
 
 const handleLogin = async (
-  event, 
-  username, 
+  event,
+  username,
   password,
   setUser,
   setUsername,

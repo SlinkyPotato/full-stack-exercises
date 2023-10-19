@@ -1,10 +1,10 @@
-import axios from 'axios'
-const baseUrl = import.meta.env.VITE_BACKEND_HOST + '/api/blogs'
+import axios from 'axios';
+const baseUrl = import.meta.env.VITE_BACKEND_HOST + '/api/blogs';
 
 const getAll = async () => {
   try {
-    const response = await axios.get(baseUrl)
-    return response.data
+    const response = await axios.get(baseUrl);
+    return response.data;
   } catch (error) {
     console.log(error);
     return null;
@@ -22,7 +22,7 @@ const create = async (newObject, setUser) => {
         'Content-Type': 'application/json'
       }
     });
-    return response.data
+    return response.data;
   } catch (error) {
     if (error.response.status === 401) {
       window.localStorage.removeItem('loggedUser');
@@ -43,7 +43,7 @@ const updateLikesForBlog = async (blog, user, setUser) => {
         'Content-Type': 'application/json'
       }
     });
-    return response.data
+    return response.data;
   } catch (error) {
     if (error.response.status === 401) {
       window.localStorage.removeItem('loggedUser');

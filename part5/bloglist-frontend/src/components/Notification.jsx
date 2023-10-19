@@ -13,7 +13,7 @@ const Notification = ({ success, error }) => {
       marginBottom: 10,
       backgroundColor: 'lightgrey',
     };
-  
+
     return <div style={style}>{success}</div>;
   }
 
@@ -27,7 +27,7 @@ const Notification = ({ success, error }) => {
       marginBottom: 10,
       backgroundColor: 'lightgrey',
     };
-  
+
     return <div style={style}>{error}</div>;
   }
 

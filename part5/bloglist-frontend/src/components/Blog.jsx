@@ -2,7 +2,7 @@ import Toggable from './Toggable';
 import blogService from '../services/blogs';
 
 const Blog = ({ blog, setUser, updateBlog, removeBlog }) => {
-  
+
   const handleLike = async (event) => {
     event.preventDefault();
     try {
@@ -37,7 +37,7 @@ const Blog = ({ blog, setUser, updateBlog, removeBlog }) => {
     <div>
       {blog.title} by {blog.author} <br />
       <Toggable buttonLabel='view'>
-        <div style={{border: '2px solid black'}}>
+        <div style={{ border: '2px solid black' }}>
           URL: {blog.url} <br />
           Likes: {blog.likes} <button onClick={handleLike}>like</button> <br />
           Author: {blog.user.name} <br />
@@ -46,6 +46,6 @@ const Blog = ({ blog, setUser, updateBlog, removeBlog }) => {
       </Toggable>
     </div>
   );
-}
+};
 
-export default Blog
+export default Blog;
