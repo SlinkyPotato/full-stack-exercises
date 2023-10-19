@@ -18,9 +18,10 @@ const App = () => {
   const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs( blogs )
-    );
+    blogService.getAll().then(blogs => {
+      blogs.sort((a, b) => b.likes - a.likes);
+      setBlogs(blogs)
+    });
 
     const loggedUserJSON = window.localStorage.getItem('loggedUser');
     if (loggedUserJSON && loggedUserJSON != '' && loggedUserJSON != 'null') {
@@ -38,7 +39,7 @@ const App = () => {
       author: author,
       url: url,
     };
-    const returnedBlog = await blogService.create(blogObject);
+    const returnedBlog = await blogService.create(blogObject, setUser);
     if (!returnedBlog) {
       setErrorMessage('error creating blog');
       setTimeout(() => {
@@ -54,6 +55,14 @@ const App = () => {
       setAuthor('');
       setUrl('');
     }
+  };
+
+  const updateBlog = async (blog) => {
+    setBlogs(blogs.map(b => b.id === blog.id ? blog : b));
+  };
+
+  const removeBlog = async (blog) => {
+    setBlogs(blogs.filter(b => b.id !== blog.id));
   };
 
   return (
@@ -98,7 +107,13 @@ const App = () => {
           <div>
             <br />
             {blogs.map(blog =>
-              <Blog key={blog.id} blog={blog} />
+              <Blog 
+                key={blog.id} 
+                blog={blog} 
+                setUser={setUser} 
+                updateBlog={updateBlog} 
+                removeBlog={removeBlog}
+              />
             )}            
           </div>
         </>

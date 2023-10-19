@@ -14,13 +14,19 @@ Content-Type: application/json
 }
 
 ###
-DELETE http://localhost:3001/api/blogs/651c48b5270cca7f5d3290f1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlNsaW5reVBvdGF0byIsImlkIjoiNjUxYzQzNDNmMDRjZDE4ZWVmOGE4ZmI2IiwiaWF0IjoxNjk2MzczNzExLCJleHAiOjE2OTYzNzczMTF9.XLWZiYcTVMK4pnGk8eGoTEi6rM5gxUTw9wfQklakjTg
+DELETE http://localhost:3001/api/blogs/6526da1074884ee94d99812e
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlNsaW5reVBvdGF0byIsImlkIjoiNjUxYzQzNDNmMDRjZDE4ZWVmOGE4ZmI2IiwiaWF0IjoxNjk3NzM5NTUyLCJleHAiOjE2OTc3NDMxNTJ9.FsR16KVGm5lvbLCFWdvlMBScGLT0Za8pr9XJZAy2utw
 
 ###
-PATCH http://localhost:3001/api/blogs/5a7d1b4b1c9d440000b7e8b1
+PATCH http://localhost:3001/api/blogs/652c7f337e7ad1b689810ef0
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlNsaW5reVBvdGF0byIsImlkIjoiNjUxYzQzNDNmMDRjZDE4ZWVmOGE4ZmI2IiwiaWF0IjoxNjk3NDE0MTk3LCJleHAiOjE2OTc0MTc3OTd9.OH5RxXCJen46ajGgd6ZyWfi8TgaqmNkM8u9XvPoAcrM
 Content-Type: application/json
 
 {
-  "likes": null
+  "likes": 3,
+  "user": {
+    "username": "SlinkyPotato",
+    "name": "Brian Patino",
+    "id": "651c4343f04cd18eef8a8fb6"
+  }
 }

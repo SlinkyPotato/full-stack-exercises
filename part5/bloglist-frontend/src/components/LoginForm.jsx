@@ -50,7 +50,7 @@ const LoginForm = ({
       handleLogin(event, username, password, setUser, setUsername, setPassword, setErrorMessage, setSuccessMessage);
     }}>
       <div>
-        username
+        username&nbsp;
         <input
           type="text"
           value={username}
@@ -59,7 +59,7 @@ const LoginForm = ({
         />
       </div>
       <div>
-        password
+        password&nbsp;
         <input
           type="password"
           value={password}
