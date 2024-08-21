@@ -7,7 +7,9 @@ test('renders blog', () => {
     author: 'test author',
   };
 
-  const { container} = render(<Blog blog={blog} />);
+  const { container} = render(
+    <Blog blog={blog} />
+  );
   const div = container.querySelector('.blog-test');
   expect(div).toHaveTextContent('test title by test author');
 });
