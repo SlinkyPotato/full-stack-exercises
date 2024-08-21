@@ -34,13 +34,13 @@ const Blog = ({ blog, setUser, updateBlog, removeBlog }) => {
   };
 
   return (
-    <div>
+    <div className='blog-test'>
       {blog.title} by {blog.author} <br />
       <Toggable buttonLabel='view'>
         <div style={{ border: '2px solid black' }}>
           URL: {blog.url} <br />
           Likes: {blog.likes} <button onClick={handleLike}>like</button> <br />
-          Author: {blog.user.name} <br />
+          Author: {blog.author} <br />
         </div>
         <button onClick={handleRemove}>remove</button>
       </Toggable>
